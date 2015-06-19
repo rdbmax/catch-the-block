@@ -18,7 +18,8 @@
     <script>
     var scene;
     window.onload = function() {
-        var addCube, group = {}, socket = io.connect('95.142.166.18:8089');
+        //var addCube, group = {}, socket = io.connect('95.142.166.18:8089');
+        var addCube, group = {}, socket = io.connect('172.16.235.86:49170');
         var renderer, camera, light, myCube, target;
         function init () {
             renderer = new THREE.WebGLRenderer();
