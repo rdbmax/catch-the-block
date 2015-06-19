@@ -17,8 +17,7 @@ dns.lookup(os.hostname(), function (err, add, fam) {
 
     // requete http sur la racine du server
     app.get('/', function (req, res) {
-        res.render('game3d', { adresse : add, port : port })
-      res.sendfile(__dirname + '/game3d.html');
+        res.render('game3d', { adresse : add, port : port });
     });
 
     app.get('/three.min.js', function (req, res) {
