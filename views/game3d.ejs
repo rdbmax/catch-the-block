@@ -76,7 +76,7 @@
         function randomColor() {
             return Math.random() * 0x808008 + 0x808080;
         }
-        addCube = function addCube(obj) {
+        function addCube(obj) {
             var pos, pseudo, color;
             if( obj.position ) pos = obj.position;
             else pos = randomPosition();
@@ -84,8 +84,16 @@
             else pseudo = prompt('Quel est ton pseudo ?');
             if( obj.color ) color = obj.color;
             else color = randomColor();
-            var geometry = new THREE.CubeGeometry( 2, 2, 2 ), material = new THREE.MeshPhongMaterial({ ambient: 0x030303, color: color, specular: 0x009900, shininess: 30, shading: THREE.FlatShading }), mesh = new THREE.Mesh( geometry, material );
-            mesh.position = pos;
+            var geometry = new THREE.BoxGeometry( 2, 2, 2 ),
+            material = new THREE.MeshPhongMaterial({
+                ambient: 0x030303,
+                color: color,
+                specular: 0x009900,
+                shininess: 30,
+                shading: THREE.FlatShading
+            }),
+            mesh = new THREE.Mesh( geometry, material );
+            mesh.position.set(pos.x, pos.y, pos.z);// = pos;
             mesh.name = pseudo;
             if( obj.mine ) {
                 mesh.userData.score = 0;
@@ -115,6 +123,7 @@
                 });
                 $('#scores').append("<span id='label_"+message.pseudo+"'>"+message.pseudo+" : </span><span id='score_"+message.pseudo+"'>"+message.score+"</span><br/>");
             });
+            console.log(obj.target);
             addCube({
                 position : obj.target,
                 add : true,

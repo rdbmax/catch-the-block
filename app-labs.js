@@ -45,6 +45,8 @@ dns.lookup(os.hostname(), function (err, add, fam) {
             socket.get('pseudo', function (error, pseudo) {
                 balls[pseudo].position = message;
                 socket.broadcast.emit('move', {pseudo: pseudo, position: message});
+                console.log(message);
+                console.log(target);
                 if( JSON.stringify(message) == JSON.stringify(target) ) {
                     console.log(pseudo+' scored');
                     balls[pseudo].score ++;
