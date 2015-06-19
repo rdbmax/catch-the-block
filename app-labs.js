@@ -9,6 +9,7 @@ var app = require('express')(),
     balls = {},
     target = {};
 
+    app.set('view engine', 'ejs');  
 // démarage du server
 dns.lookup(os.hostname(), function (err, add, fam) {
 
@@ -16,6 +17,7 @@ dns.lookup(os.hostname(), function (err, add, fam) {
 
     // requete http sur la racine du server
     app.get('/', function (req, res) {
+        res.render('game3d', { adresse : add, port : port })
       res.sendfile(__dirname + '/game3d.html');
     });
 

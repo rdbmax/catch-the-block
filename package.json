@@ -4,7 +4,8 @@
     "dependencies": {
         "express": "~4.x",
         "socket.io": "~0.9.16",
-        "ent": "~0.1.0"
+        "ent": "~0.1.0",
+        "ejs": "~2.3.1"
     },
     "author": "Rdb <rdbmax@gmail.com>",
     "description": "Ma premiere experimentation NodeJs vs ThreeJs"
