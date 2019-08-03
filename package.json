@@ -1,5 +1,5 @@
 {
-    "name": "threeNode",
+    "name": "catch-the-block",
     "version": "0.1.0",
     "scripts": {
         "start": "node app-labs"
@@ -10,6 +10,6 @@
         "express": "~4.x",
         "socket.io": "~0.9.16"
     },
-    "author": "Rdb <rdbmax@gmail.com>",
-    "description": "Ma premiere experimentation NodeJs vs ThreeJs"
+    "author": "rdbmax <rdbmax@gmail.com>",
+    "description": "Multiplayer 3D game: you need to catch the block before other players"
 }
