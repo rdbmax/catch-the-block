@@ -12,7 +12,6 @@ app.set('view engine', 'ejs');
 
 // démarage du server
 dns.lookup(os.hostname(), function (err, add, fam) {
-
     console.log(add+':'+port); //affichage de l'ip du server
 
     // requete http sur la racine du server
@@ -30,11 +29,10 @@ dns.lookup(os.hostname(), function (err, add, fam) {
 
     // connexion d'un internaute
     io.sockets.on('connection', function (socket) {
-
         // Dès qu'on nous donne un pseudo, on le stocke en variable de session et on informe les autres personnes
         socket.on('nouveau_client', function (message) {
             var pseudo = encode(message.pseudo);
-            socket.set('pseudo', pseudo);
+            socket.pseudo = pseudo;
             socket.broadcast.emit('nouveau_client', message);
             console.log('NOUVEAU CLIENT : '+pseudo);
             socket.emit('load_partners', { balls : balls, target : target });
@@ -42,30 +40,28 @@ dns.lookup(os.hostname(), function (err, add, fam) {
         });
 
         socket.on('move', function (message) {
-            socket.get('pseudo', function (error, pseudo) {
-                balls[pseudo].position = message;
-                socket.broadcast.emit('move', {pseudo: pseudo, position: message});
-                console.log(message);
-                console.log(target);
-                if( JSON.stringify(message) == JSON.stringify(target) ) {
-                    console.log(pseudo+' scored');
-                    balls[pseudo].score ++;
-                    newTarget();
-                    socket.emit('scoreUp', pseudo);
-                    socket.broadcast.emit('scoreUp', pseudo);
-                }
-            });
+            var pseudo = socket.pseudo;
+            balls[pseudo].position = message;
+            socket.broadcast.emit('move', { pseudo: pseudo, position: message });
+            console.log(message);
+            console.log(target);
+            if( JSON.stringify(message) == JSON.stringify(target) ) {
+                console.log(pseudo+' scored');
+                balls[pseudo].score ++;
+                newTarget();
+                socket.emit('scoreUp', pseudo);
+                socket.broadcast.emit('scoreUp', pseudo);
+            }
         });
 
         // Deconnexion de l'internaute
         socket.on('disconnect', function () {
-          socket.get('pseudo', function (error, pseudo) {
+            var pseudo = socket.pseudo;
             delete balls[pseudo];
             console.log(pseudo + ' got disconnect!');
             socket.broadcast.emit('deconnexion', pseudo);
             console.log(balls);
-          });
-       });
+        });
     });
 
     //création d'une nouvelle cible
@@ -82,5 +78,4 @@ dns.lookup(os.hostname(), function (err, add, fam) {
 
     newTarget();
     server.listen(port);
-
 });

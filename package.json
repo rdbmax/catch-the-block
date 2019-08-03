@@ -7,8 +7,8 @@
     "dependencies": {
         "ejs": "^2.6.2",
         "ent": "^2.2.0",
-        "express": "~4.x",
-        "socket.io": "~0.9.16"
+        "express": "^4.17.1",
+        "socket.io": "^2.2.0"
     },
     "author": "rdbmax <rdbmax@gmail.com>",
     "description": "Multiplayer 3D game: you need to catch the block before other players"
