@@ -12,7 +12,7 @@ app.set('view engine', 'ejs');
 
 // démarage du server
 dns.lookup(os.hostname(), function (err, add, fam) {
-    console.log(add+':'+port); //affichage de l'ip du server
+    console.log('http://' + add + ':' + port); //affichage de l'ip du server
 
     // requete http sur la racine du server
     app.get('/', function (req, res) {

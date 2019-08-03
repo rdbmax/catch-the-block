@@ -149,7 +149,11 @@
 
         socket.on('move', function (message) {
             $.each(scene.children, function (x,y) {
-                if( y.name == message.pseudo ) y.position = message.position;
+                if( y.name == message.pseudo ) {
+                    y.position.x = message.position.x;
+                    y.position.y = message.position.y;
+                    y.position.z = message.position.z;
+                };
             });
         });
 
