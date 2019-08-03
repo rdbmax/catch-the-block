@@ -2,14 +2,14 @@ var app = require('express')(),
     port = process.env.PORT || 5000,
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
-    ent = require('ent'), // Permet de bloquer les caractères HTML (sécurité équivalente à htmlentities en PHP)
-    fs = require('fs'),
+    encode = require('ent/encode'),
     dns = require('dns'),
     os = require('os'),
     balls = {},
     target = {};
 
-    app.set('view engine', 'ejs');  
+app.set('view engine', 'ejs');
+
 // démarage du server
 dns.lookup(os.hostname(), function (err, add, fam) {
 
@@ -33,7 +33,7 @@ dns.lookup(os.hostname(), function (err, add, fam) {
 
         // Dès qu'on nous donne un pseudo, on le stocke en variable de session et on informe les autres personnes
         socket.on('nouveau_client', function (message) {
-            var pseudo = ent.encode(message.pseudo);
+            var pseudo = encode(message.pseudo);
             socket.set('pseudo', pseudo);
             socket.broadcast.emit('nouveau_client', message);
             console.log('NOUVEAU CLIENT : '+pseudo);

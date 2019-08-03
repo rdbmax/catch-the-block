@@ -1,11 +1,14 @@
 {
     "name": "threeNode",
     "version": "0.1.0",
+    "scripts": {
+        "start": "node app-labs"
+    },
     "dependencies": {
+        "ejs": "^2.6.2",
+        "ent": "^2.2.0",
         "express": "~4.x",
-        "socket.io": "~0.9.16",
-        "ent": "~0.1.0",
-        "ejs": "~2.3.1"
+        "socket.io": "~0.9.16"
     },
     "author": "Rdb <rdbmax@gmail.com>",
     "description": "Ma premiere experimentation NodeJs vs ThreeJs"
