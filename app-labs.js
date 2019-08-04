@@ -68,7 +68,7 @@ dns.lookup(os.hostname(), function (err, add, fam) {
     function newTarget() {
         var toReturn = {
             x : Math.round(Math.random()*20),
-            y : 0,
+            y : 1,
             z : Math.round(Math.random()*20)
         };
         target = toReturn;
