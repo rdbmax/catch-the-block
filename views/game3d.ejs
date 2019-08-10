@@ -71,6 +71,9 @@
                 else if (direction == '38') myCube.position.x += 1;
                 else if (direction == '39') myCube.position.z += 1;
                 else if (direction == '40') myCube.position.x -= 1;
+
+                camera.position.set(myCube.position.x - 10, myCube.position.y + 10, myCube.position.z);
+                camera.lookAt(myCube.position.x, myCube.position.y, myCube.position.z)
             }
 
             socket.emit('nouveau_client', addCube({mine:true}));
@@ -115,6 +118,10 @@
             if( obj.mine ) {
                 mesh.userData.score = 0;
                 myCube = mesh;
+
+                camera.position.set(pos.x, pos.y + 20, pos.z);
+                camera.lookAt(pos.x, pos.y, pos.z);
+
                 scene.add(myCube);
             }
             else if( obj.add ) scene.add( mesh );
