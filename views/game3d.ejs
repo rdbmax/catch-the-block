@@ -13,9 +13,20 @@
         }
     </style>
     <script src="three.min.js"></script>
-    <script src="jquery.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+    function generateScoreSection (name, userScore, isCurrentPlayer) {
+        var scoreSection = document.createElement("p"),
+            score = document.createElement("span"),
+            displayName = isCurrentPlayer ? ('Me (' + name + ')') : name;
+        scoreSection.id = 'label_' + name;
+        score.id = 'score_' + name;
+        score.append(userScore);
+        scoreSection.append(displayName + ' : ');
+        scoreSection.appendChild(score);
+        return scoreSection;
+    }
+
     var scene;
     window.onload = function() {
         var addCube, group = {}, socket = io.connect(document.location.href);
@@ -77,7 +88,12 @@
             }
 
             socket.emit('nouveau_client', addCube({mine:true}));
-            $('body').append("<p id='scores'><span>Me : </span><span id='myscore'>0</span><br/></p>");
+
+            var scoreContainer = document.createElement("div");
+            scoreContainer.id = 'scores';
+            var scoreSection = generateScoreSection(myCube.name, 0, true);
+            scoreContainer.appendChild(scoreSection);
+            document.getElementsByTagName('body')[0].append(scoreContainer);
         }
         function animate() {
             requestAnimationFrame( animate );
@@ -137,7 +153,8 @@
         animate();
 
         socket.on('load_partners', function (obj) {
-            $.each(obj.balls, function (x,message) {
+            Object.keys(obj.balls).forEach(function (key) {
+                var message = obj.balls[key];
                 group[message.pseudo] = message;
                 addCube({
                     position: message.position,
@@ -145,9 +162,11 @@
                     color: message.color,
                     add: true
                 });
-                $('#scores').append("<span id='label_"+message.pseudo+"'>"+message.pseudo+" : </span><span id='score_"+message.pseudo+"'>"+message.score+"</span><br/>");
+
+                var scoreSection = generateScoreSection(message.pseudo, message.score);
+                document.getElementById('scores').appendChild(scoreSection);
             });
-            console.log(obj.target);
+
             addCube({
                 position : obj.target,
                 add : true,
@@ -164,7 +183,9 @@
                 color: message.color,
                 add: true
             });
-            $('#scores').append("<span id='label_"+message.pseudo+"'>"+message.pseudo+" : </span><span id='score_"+message.pseudo+"'>0</span><br/>");
+
+            var scoreSection = generateScoreSection(message.pseudo, 0);
+            document.getElementById('scores').appendChild(scoreSection);
         });
 
         function emitMove(codeMove) {
@@ -172,18 +193,18 @@
         }
 
         socket.on('move', function (message) {
-            $.each(scene.children, function (x,y) {
-                if( y.name == message.pseudo ) {
-                    y.position.x = message.position.x;
-                    y.position.y = message.position.y;
-                    y.position.z = message.position.z;
+            scene.children.forEach(function (sceneChild) {
+                if( sceneChild.name == message.pseudo ) {
+                    sceneChild.position.x = message.position.x;
+                    sceneChild.position.y = message.position.y;
+                    sceneChild.position.z = message.position.z;
                 };
             });
         });
 
         socket.on('newTarget', function (data) {
-            $.each(scene.children, function (x,y) {
-                if( y != undefined ) if( y.name == 'target' ) scene.remove( y );
+            scene.children.forEach(function (sceneChild) {
+                if( sceneChild != undefined ) if( sceneChild.name == 'target' ) scene.remove(sceneChild);
             });
             addCube({
                 position : data,
@@ -194,23 +215,16 @@
         });
 
         socket.on('scoreUp', function (name) {
-            console.log(name);
-            console.log(myCube.name);
-            if( name == myCube.name ) {
-                myCube.userData.score++;
-                $('#myscore')[0].innerText = myCube.userData.score;
-            }
-            else {
-                group[name].score++;
-                $('#score_'+name)[0].innerText = group[name].score;
-            }
+            var newScore = (name == myCube.name)
+                ? ++myCube.userData.score
+                : ++group[name].score;
+            document.getElementById('score_' + name).innerText = newScore;
         });
 
         socket.on('deconnexion', function (pseudo) {
-            $('#score_'+pseudo).next().remove();
-            $('#score_'+pseudo+', #label_'+pseudo).remove();
-            $.each(scene.children, function (x,y) {
-                if( y != undefined ) if( y.name == pseudo ) scene.remove( y );
+            document.getElementById('label_' + pseudo).remove();
+            scene.children.forEach(function (sceneChild) {
+                if( sceneChild != undefined ) if( sceneChild.name == pseudo ) scene.remove(sceneChild);
             });
         });
     };

@@ -23,10 +23,6 @@ dns.lookup(os.hostname(), function (err, add, fam) {
       res.sendfile(__dirname + '/three.min.js');
     });
 
-    app.get('/jquery.js', function (req, res) {
-      res.sendfile(__dirname + '/jquery.js');
-    });
-
     // connexion d'un internaute
     io.sockets.on('connection', function (socket) {
         // Dès qu'on nous donne un pseudo, on le stocke en variable de session et on informe les autres personnes
