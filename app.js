@@ -1,5 +1,6 @@
-var app = require('express')(),
-    port = process.env.PORT || 5000,
+const express = require('express');
+const app = express();
+var port = process.env.PORT || 5000,
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
     encode = require('ent/encode'),
@@ -11,12 +12,7 @@ var app = require('express')(),
 dns.lookup(os.hostname(), function (err, add, fam) {
     console.log('http://' + add + ':' + port); //affichage de l'ip du server
 
-    app.get('/', function (req, res) {
-      res.sendfile(__dirname + '/public/index.html');
-    });
-    app.get('/three.min.js', function (req, res) {
-      res.sendfile(__dirname + '/public/three.min.js');
-    });
+    app.use(express.static('public'));
 
     // connexion d'un internaute
     io.sockets.on('connection', function (socket) {
