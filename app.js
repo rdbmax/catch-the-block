@@ -8,19 +8,14 @@ var app = require('express')(),
     balls = {},
     target = {};
 
-app.set('view engine', 'ejs');
-
-// démarage du server
 dns.lookup(os.hostname(), function (err, add, fam) {
     console.log('http://' + add + ':' + port); //affichage de l'ip du server
 
-    // requete http sur la racine du server
     app.get('/', function (req, res) {
-        res.render('game3d', { adresse : add, port : port });
+      res.sendfile(__dirname + '/public/index.html');
     });
-
     app.get('/three.min.js', function (req, res) {
-      res.sendfile(__dirname + '/three.min.js');
+      res.sendfile(__dirname + '/public/three.min.js');
     });
 
     // connexion d'un internaute
