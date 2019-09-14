@@ -13,6 +13,7 @@
         }
     </style>
     <script src="three.min.js"></script>
+    <script src="GLTFLoader.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
     function generateScoreSection (name, userScore, isCurrentPlayer) {
@@ -29,6 +30,7 @@
 
     var scene;
     window.onload = function() {
+        var loader = new THREE.GLTFLoader(), model;
         var addCube, group = {}, socket = io.connect(document.location.href);
         var renderer, camera, light, myCube, target;
         function init () {
@@ -88,12 +90,6 @@
             }
 
             socket.emit('nouveau_client', addCube({mine:true}));
-
-            var scoreContainer = document.createElement("div");
-            scoreContainer.id = 'scores';
-            var scoreSection = generateScoreSection(myCube.name, 0, true);
-            scoreContainer.appendChild(scoreSection);
-            document.getElementsByTagName('body')[0].append(scoreContainer);
         }
         function animate() {
             requestAnimationFrame( animate );
@@ -132,13 +128,29 @@
             mesh.position.set(pos.x, pos.y, pos.z);// = pos;
             mesh.name = pseudo;
             if( obj.mine ) {
-                mesh.userData.score = 0;
-                myCube = mesh;
+                loader.load('/RobotExpressive.glb', function (gltf) {
+                    myCube = gltf.scene;
+                    myCube.position.set(pos.x, pos.y, pos.z);
+                    myCube.rotation.y = 1.6;
+                    myCube.name = pseudo;
+                    myCube.userData.score = 0;
+                    scene.add(myCube);
+                    window.model = myCube;
+
+                    var scoreContainer = document.createElement("div");
+                    scoreContainer.id = 'scores';
+                    var scoreSection = generateScoreSection(pseudo, 0, true);
+                    scoreContainer.appendChild(scoreSection);
+                    document.getElementsByTagName('body')[0].append(scoreContainer);
+                });
+
+                // mesh.userData.score = 0;
+                // myCube = mesh;
 
                 camera.position.set(pos.x, pos.y + 20, pos.z);
                 camera.lookAt(pos.x, pos.y, pos.z);
 
-                scene.add(myCube);
+                // scene.add(myCube);
             }
             else if( obj.add ) scene.add( mesh );
             return {

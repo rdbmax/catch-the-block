@@ -20,7 +20,15 @@ dns.lookup(os.hostname(), function (err, add, fam) {
     });
 
     app.get('/three.min.js', function (req, res) {
-      res.sendfile(__dirname + '/three.min.js');
+      res.sendFile(__dirname + '/three.min.js');
+    });
+
+    app.get('/GLTFLoader.js', function (req, res) {
+      res.sendFile(__dirname + '/GLTFLoader.js');
+    });
+
+    app.get('/RobotExpressive.glb', function (req, res) {
+      res.sendFile(__dirname + '/RobotExpressive.glb');
     });
 
     // connexion d'un internaute
