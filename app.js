@@ -14,6 +14,10 @@ dns.lookup(os.hostname(), function (err, add, fam) {
 
     app.use(express.static('public'));
 
+    app.get('/three.min.js', function (req, res) {
+        res.sendFile(__dirname + '/node_modules/three/build/three.min.js');
+    });
+
     // connexion d'un internaute
     io.sockets.on('connection', function (socket) {
         // Dès qu'on nous donne un pseudo, on le stocke en variable de session et on informe les autres personnes
