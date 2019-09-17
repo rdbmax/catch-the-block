@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
 var port = process.env.PORT || 5000,
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
@@ -12,6 +13,7 @@ var port = process.env.PORT || 5000,
 dns.lookup(os.hostname(), function (err, add, fam) {
     console.log('http://' + add + ':' + port); //affichage de l'ip du server
 
+    app.use(morgan('tiny'));
     app.use(express.static('public'));
 
     app.get('/three.min.js', function (req, res) {
@@ -25,7 +27,6 @@ dns.lookup(os.hostname(), function (err, add, fam) {
             var pseudo = encode(message.pseudo);
             socket.pseudo = pseudo;
             socket.broadcast.emit('nouveau_client', message);
-            console.log('NOUVEAU CLIENT : '+pseudo);
             socket.emit('load_partners', { balls : balls, target : target });
             balls[pseudo] = message;
         });
@@ -34,10 +35,7 @@ dns.lookup(os.hostname(), function (err, add, fam) {
             var pseudo = socket.pseudo;
             balls[pseudo].position = message;
             socket.broadcast.emit('move', { pseudo: pseudo, position: message });
-            console.log(message);
-            console.log(target);
             if( JSON.stringify(message) == JSON.stringify(target) ) {
-                console.log(pseudo+' scored');
                 balls[pseudo].score ++;
                 newTarget();
                 socket.emit('scoreUp', pseudo);
@@ -49,9 +47,7 @@ dns.lookup(os.hostname(), function (err, add, fam) {
         socket.on('disconnect', function () {
             var pseudo = socket.pseudo;
             delete balls[pseudo];
-            console.log(pseudo + ' got disconnect!');
             socket.broadcast.emit('deconnexion', pseudo);
-            console.log(balls);
         });
     });
 
@@ -63,7 +59,6 @@ dns.lookup(os.hostname(), function (err, add, fam) {
             z : Math.round(Math.random()*20)
         };
         target = toReturn;
-        console.log(toReturn);
         io.sockets.emit('newTarget', toReturn);
     }
 
