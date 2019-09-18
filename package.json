@@ -2,8 +2,9 @@
     "name": "catch-the-block",
     "version": "0.1.0",
     "scripts": {
-        "start": "node app",
-        "start:debug": "DEBUG=socket.io:socket,socket.io-parser* node app"
+        "start": "webpack --config client/webpack.config.js && node app",
+        "start:debug": "webpack --config client/webpack.config.dev.js && DEBUG=socket.io:socket,socket.io-parser* node app",
+        "build": "webpack --config client/webpack.config.js"
     },
     "dependencies": {
         "ent": "^2.2.0",
@@ -13,5 +14,9 @@
         "three": "^0.107.0"
     },
     "author": "rdbmax <rdbmax@gmail.com>",
-    "description": "Multiplayer 3D game: you need to catch the block before other players"
+    "description": "Multiplayer 3D game: you need to catch the block before other players",
+    "devDependencies": {
+        "webpack": "^4.40.2",
+        "webpack-cli": "^3.3.9"
+    }
 }
