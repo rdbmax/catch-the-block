@@ -2,8 +2,8 @@
     "name": "catch-the-block",
     "version": "0.1.0",
     "scripts": {
-        "start": "webpack --config client/webpack.config.js && node app",
-        "start:debug": "webpack --config client/webpack.config.dev.js && DEBUG=socket.io:socket,socket.io-parser* node app",
+        "start": "webpack --config client/webpack.config.js && node --experimental-modules app.js",
+        "start:debug": "webpack --config client/webpack.config.dev.js && DEBUG=socket.io:socket,socket.io-parser* node --experimental-modules app.js",
         "build": "webpack --config client/webpack.config.js"
     },
     "dependencies": {
@@ -21,5 +21,9 @@
         "babel-loader": "^8.0.6",
         "webpack": "^4.40.2",
         "webpack-cli": "^3.3.9"
+    },
+    "type": "module",
+    "engines" : {
+        "node" : ">=12.10.0"
     }
 }

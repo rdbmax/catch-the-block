@@ -1,14 +1,30 @@
-const express = require('express');
+import express from 'express';
+import encode from 'ent/encode.js';
+import dns from 'dns';
+import os from 'os';
+import morgan from 'morgan';
+import http from 'http';
+import socketIO  from 'socket.io';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import {
+    DECONNEXION,
+    SCORE_UP,
+    NEW_TARGET,
+    MOVE,
+    NEW_PLAYER,
+    LOAD_PLAYERS
+} from './shared/index.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
-const morgan = require('morgan');
-var port = process.env.PORT || 5000,
-    server = require('http').createServer(app),
-    io = require('socket.io').listen(server),
-    encode = require('ent/encode'),
-    dns = require('dns'),
-    os = require('os'),
-    balls = {},
-    target = {};
+const port = process.env.PORT || 5000;
+const server = http.createServer(app);
+const io = socketIO.listen(server);
+const balls = {};
+let target = {};
+
+console.log(SCORE_UP, __dirname);
 
 dns.lookup(os.hostname(), function (err, add, fam) {
     console.log('http://' + add + ':' + port); //affichage de l'ip du server
@@ -23,19 +39,19 @@ dns.lookup(os.hostname(), function (err, add, fam) {
     // connexion d'un internaute
     io.sockets.on('connection', function (socket) {
         // Dès qu'on nous donne un pseudo, on le stocke en variable de session et on informe les autres personnes
-        socket.on('nouveau_client', function (message) {
+        socket.on(NEW_PLAYER, (message) => {
             var pseudo = encode(message.pseudo);
             socket.pseudo = pseudo;
-            socket.broadcast.emit('nouveau_client', message);
-            socket.emit('load_partners', { balls : balls, target : target });
+            socket.broadcast.emit(NEW_PLAYER, message);
+            socket.emit(LOAD_PLAYERS, { balls: balls, target: target });
             balls[pseudo] = message;
         });
 
-        socket.on('move', function (message) {
+        socket.on(MOVE, (message) => {
             var pseudo = socket.pseudo;
             balls[pseudo].position = message;
-            socket.broadcast.emit('move', { pseudo: pseudo, position: message });
-            if( JSON.stringify(message) == JSON.stringify(target) ) {
+            socket.broadcast.emit(MOVE, { pseudo: pseudo, position: message });
+            if(JSON.stringify(message) == JSON.stringify(target)) {
                 balls[pseudo].score ++;
                 newTarget();
                 socket.emit('scoreUp', pseudo);
@@ -44,10 +60,10 @@ dns.lookup(os.hostname(), function (err, add, fam) {
         });
 
         // Deconnexion de l'internaute
-        socket.on('disconnect', function () {
-            var pseudo = socket.pseudo;
+        socket.on('disconnect', () => {
+            const pseudo = socket.pseudo;
             delete balls[pseudo];
-            socket.broadcast.emit('deconnexion', pseudo);
+            socket.broadcast.emit(DECONNEXION, pseudo);
         });
     });
 
@@ -59,7 +75,7 @@ dns.lookup(os.hostname(), function (err, add, fam) {
             z : Math.round(Math.random()*20)
         };
         target = toReturn;
-        io.sockets.emit('newTarget', toReturn);
+        io.sockets.emit(NEW_TARGET, toReturn);
     }
 
     newTarget();

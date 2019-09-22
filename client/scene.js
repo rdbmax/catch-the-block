@@ -1,3 +1,16 @@
+import socket, {
+    DECONNEXION,
+    SCORE_UP,
+    NEW_TARGET,
+    MOVE,
+    NEW_PLAYER,
+    LOAD_PLAYERS
+} from './api'
+import {
+    randomPosition,
+    randomColor
+} from './helpers';
+
 function generateScoreSection (name, userScore, isCurrentPlayer) {
     var scoreSection = document.createElement("p"),
         score = document.createElement("span"),
@@ -10,39 +23,40 @@ function generateScoreSection (name, userScore, isCurrentPlayer) {
     return scoreSection;
 }
 
-var scene;
+const renderer = new THREE.WebGLRenderer();
+renderer.setPixelRatio( window.devicePixelRatio );
+renderer.setSize( window.innerWidth, window.innerHeight );
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color( 0xe0e0e0 );
+scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
+camera.position.set( -15, 10, 10 );
+camera.lookAt( scene.position );
+
+const light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+light.position.set(-10, 20, 10);
+
+const grid = new THREE.GridHelper( 200, 40, 0x000000, 0x000000 );
+grid.material.opacity = 0.2;
+grid.material.transparent = true;
+
+const ground = new THREE.Mesh(new THREE.PlaneBufferGeometry(2000, 2000), new THREE.MeshPhongMaterial({ color: 0x999999, depthWrite: false }));
+ground.rotation.x = - Math.PI / 2;
+
+scene.add(light);
+scene.add(ground);
+scene.add(grid);
+
 const onWindowLoaded = function() {
-    var addCube, group = {}, socket = io.connect(document.location.href);
-    var renderer, camera, light, myCube, target;
+    var myCube, addCube, group = {};
+
     function init () {
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        document.body.appendChild( renderer.domElement );
+        document.body.appendChild(renderer.domElement);
+        renderer.render(scene, camera);
 
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color( 0xe0e0e0 );
-        scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
-
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 3000);
-        camera.position.set( -15, 10, 10 );
-        camera.lookAt( scene.position );
-
-        var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-        light.position.set( -10, 20, 10 );
-        scene.add( light );
-
-        var ground = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
-        ground.rotation.x = - Math.PI / 2;
-        scene.add( ground );
-        var grid = new THREE.GridHelper( 200, 40, 0x000000, 0x000000 );
-        grid.material.opacity = 0.2;
-        grid.material.transparent = true;
-        scene.add( grid );
-
-        renderer.render( scene, camera );
-
-        window.addEventListener( 'resize', onWindowResize, false );
+        window.addEventListener('resize', onWindowResize, false);
         function onWindowResize() {
             windowHalfX = window.innerWidth / 2;
             windowHalfY = window.innerHeight / 2;
@@ -70,7 +84,7 @@ const onWindowLoaded = function() {
             camera.lookAt(myCube.position.x, myCube.position.y, myCube.position.z)
         }
 
-        socket.emit('nouveau_client', addCube({mine:true}));
+        socket.emit(NEW_PLAYER, addCube({mine:true}));
 
         var scoreContainer = document.createElement("div");
         scoreContainer.id = 'scores';
@@ -84,16 +98,6 @@ const onWindowLoaded = function() {
     }
     function render() {
         renderer.render( scene, camera );
-    }
-    function randomPosition() {
-        return {
-            x: Math.round(Math.random()*10),
-            y: 1,
-            z: Math.round(Math.random()*10)
-        };
-    }
-    function randomColor() {
-        return Math.random() * 0x808008 + 0x808080;
     }
     function addCube(obj) {
         var pos, pseudo, color;
@@ -123,7 +127,7 @@ const onWindowLoaded = function() {
 
             scene.add(myCube);
         }
-        else if( obj.add ) scene.add( mesh );
+        else if(obj.add) scene.add( mesh );
         return {
             pseudo : pseudo,
             position: pos,
@@ -135,7 +139,7 @@ const onWindowLoaded = function() {
     init();
     animate();
 
-    socket.on('load_partners', function (obj) {
+    socket.on(LOAD_PLAYERS, function (obj) {
         Object.keys(obj.balls).forEach(function (key) {
             var message = obj.balls[key];
             group[message.pseudo] = message;
@@ -158,7 +162,7 @@ const onWindowLoaded = function() {
         });
     });
 
-    socket.on('nouveau_client', function (message) {
+    socket.on(NEW_PLAYER, function (message) {
         group[message.pseudo] = message;
         addCube({
             position: message.position,
@@ -172,10 +176,10 @@ const onWindowLoaded = function() {
     });
 
     function emitMove(codeMove) {
-        socket.emit('move', myCube.position);
+        socket.emit(MOVE, myCube.position);
     }
 
-    socket.on('move', function (message) {
+    socket.on(MOVE, function (message) {
         scene.children.forEach(function (sceneChild) {
             if( sceneChild.name == message.pseudo ) {
                 sceneChild.position.x = message.position.x;
@@ -185,7 +189,7 @@ const onWindowLoaded = function() {
         });
     });
 
-    socket.on('newTarget', function (data) {
+    socket.on(NEW_TARGET, function (data) {
         scene.children.forEach(function (sceneChild) {
             if( sceneChild != undefined ) if( sceneChild.name == 'target' ) scene.remove(sceneChild);
         });
@@ -197,14 +201,14 @@ const onWindowLoaded = function() {
         });
     });
 
-    socket.on('scoreUp', function (name) {
+    socket.on(SCORE_UP, function (name) {
         var newScore = (name == myCube.name)
             ? ++myCube.userData.score
             : ++group[name].score;
         document.getElementById('score_' + name).innerText = newScore;
     });
 
-    socket.on('deconnexion', function (pseudo) {
+    socket.on(DECONNEXION, function (pseudo) {
         document.getElementById('label_' + pseudo).remove();
         scene.children.forEach(function (sceneChild) {
             if( sceneChild != undefined ) if( sceneChild.name == pseudo ) scene.remove(sceneChild);
