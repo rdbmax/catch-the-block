@@ -6,10 +6,17 @@ import socket, {
     NEW_PLAYER,
     LOAD_PLAYERS
 } from './api'
+import store from './store';
 import {
     randomPosition,
     randomColor
 } from './helpers';
+
+// store.subscribe(() => console.log(store.getState()))
+// store.dispatch({ type: 'INCREMENT' })
+// console.log(
+//     store.getState()
+// )
 
 function generateScoreSection (name, userScore, isCurrentPlayer) {
     var scoreSection = document.createElement("p"),
@@ -97,7 +104,7 @@ const onWindowLoaded = function() {
         render();
     }
     function render() {
-        renderer.render( scene, camera );
+        renderer.render(scene, camera);
     }
     function addCube(obj) {
         var pos, pseudo, color;
@@ -107,7 +114,7 @@ const onWindowLoaded = function() {
         else pseudo = prompt('Quel est ton pseudo ?');
         if( obj.color ) color = obj.color;
         else color = randomColor();
-        var geometry = new THREE.BoxGeometry( 2, 2, 2 ),
+        var geometry = new THREE.BoxGeometry(2, 2, 2),
         material = new THREE.MeshPhongMaterial({
             ambient: 0x030303,
             color: color,
