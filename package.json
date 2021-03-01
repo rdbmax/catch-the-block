@@ -12,7 +12,7 @@
         "morgan": "^1.9.1",
         "redux": "^4.0.4",
         "socket.io": "^2.3.0",
-        "three": "^0.108.0"
+        "three": "^0.125.0"
     },
     "author": "rdbmax <rdbmax@gmail.com>",
     "description": "Multiplayer 3D game: you need to catch the block before other players",
