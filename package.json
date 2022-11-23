@@ -11,7 +11,7 @@
         "express": "^4.17.1",
         "morgan": "^1.9.1",
         "redux": "^4.0.4",
-        "socket.io": "^2.3.0",
+        "socket.io": "^2.5.0",
         "three": "^0.108.0"
     },
     "author": "rdbmax <rdbmax@gmail.com>",
